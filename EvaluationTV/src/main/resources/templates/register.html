@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inscription</title>
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+  <div class="auth-container">
+    <form th:action="@{/register}" method="post" class="auth-form" enctype="multipart/form-data">
+      <h2>Inscription</h2>
+
+      <label for="name">Nom complet</label>
+      <input type="text" id="name" name="name" required autocomplete="off">
+
+      <!-- <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" name="email" required autocomplete="off">-->
+
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" name="password" required autocomplete="off">
+
+      <label for="image">Image de Profil</label>
+      <input type="file" name="image" id="image" accept="image/*">
+
+      <img src="" class="Image_Source"></img>
+      <div class="absent" th:if="${error != null}">
+        <p>erreur : <span th:text="${error}" style="color: red;"></span></p>
+      </div>
+      
+      <button type="submit">Créer un compte</button>
+
+      <p class="link">Déjà inscrit ? <a href="/login">Se connecter</a></p>
+    </form>
+  </div>
+</body>
+<script th:src="@{/js/register.js}"></script>
+</html>
+

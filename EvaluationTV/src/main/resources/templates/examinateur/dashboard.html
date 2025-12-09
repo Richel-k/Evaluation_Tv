@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Système d'Évaluation</title>
+    <link rel="stylesheet" th:href="@{/css/Home.css}">
+
+</head>
+
+<body>
+    <!-- Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ============================================ -->
+    <!-- SIDEBAR EXAMINATEUR -->
+    <!-- ============================================ -->
+    <div class="sidebar examinateur-sidebar" id="sidebar">
+        <h2>👨‍🏫 Examinateur</h2>
+        <a th:href="@{/examinateur/dashboard}">🏠 Dashboard</a>
+        <a th:href="@{/examinateur/sessions}">📝 Mes Sessions</a>
+        <a th:href="@{/examinateur/create-session}">➕ Créer Session</a>
+        <a href="#stats">📊 Statistiques</a>
+        <a href="/logout" class="logout">🚪 Déconnexion</a>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT EXAMINATEUR -->
+    <!-- ============================================ -->
+    <div class="main">
+        <div class="content-wrapper">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-avatar">JD</div>
+                <div class="profile-info">
+                    <div class="profile-name" th:text="${nomComplet}">Dr. Jean Dupont</div>
+                    <div class="profile-email" th:text="${MyEmail}">jean.dupont@universite.fr</div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">247</div>
+                        <div class="stat-label">Candidats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <!-- Créer Session -->
+                <div class="action-card">
+                    <div class="action-icon blue">➕</div>
+                    <div class="action-title">Créer une Session</div>
+                    <div class="action-description">
+                        Créez une nouvelle session d'évaluation avec des questions personnalisées
+                    </div>
+                    <button class="action-button" onclick="createSession()">
+                        Nouvelle Session
+                    </button>
+                </div>
+
+                <!-- Modifier Session -->
+                <div class="action-card">
+                    <div class="action-icon green">✏️</div>
+                    <div class="action-title">Modifier une Session</div>
+                    <div class="action-description">
+                        Modifiez une session existante en entrant son ID
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="modifySessionId" placeholder="ID de la session" />
+                        <button onclick="modifySession()">Modifier</button>
+                    </div>
+                </div>
+
+                <!-- Consulter Stats -->
+                <div class="action-card">
+                    <div class="action-icon purple">📊</div>
+                    <div class="action-title">Statistiques</div>
+                    <div class="action-description">
+                        Consultez les performances globales de vos candidats
+                    </div>
+                    <button class="action-button secondary" onclick="viewStats()">
+                        Voir les Stats
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sessions List -->
+            <div class="sessions-section">
+                <div class="section-header">
+                    <h2 class="section-title">📝 Mes Sessions</h2>
+                    <button class="btn-primary btn-small" onclick="refreshSessions()">
+                        🔄 Actualiser
+                    </button>
+                </div>
+
+                <!-- Session Item 1 -->
+                <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">SESSION-2024-001</span>
+                        <span class="session-status status-active">En cours</span>
+                    </div>
+                    <div class="session-title">Examen de Programmation Java</div>
+                    <div class="session-details">
+                        <span>📅 15 Déc 2024</span>
+                        <span>⏰ 14:00</span>
+                        <span>👥 45 candidats</span>
+                        <span>❓ 20 questions</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewSession(1)">Voir</button>
+                        <button class="btn-small btn-secondary" onclick="editSession(1)">Modifier</button>
+                        <button class="btn-small btn-danger" onclick="deleteSession(1)">Supprimer</button>
+                    </div>
+                </div>
+
+                <!-- Session Item 2 -->
+                <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">SESSION-2024-002</span>
+                        <span class="session-status status-planned">Planifiée</span>
+                    </div>
+                    <div class="session-title">Test Base de Données SQL</div>
+                    <div class="session-details">
+                        <span>📅 20 Déc 2024</span>
+                        <span>⏰ 10:00</span>
+                        <span>👥 38 candidats</span>
+                        <span>❓ 15 questions</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewSession(2)">Voir</button>
+                        <button class="btn-small btn-secondary" onclick="editSession(2)">Modifier</button>
+                        <button class="btn-small btn-danger" onclick="deleteSession(2)">Supprimer</button>
+                    </div>
+                </div>
+
+                <!-- Session Item 3 -->
+                <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">SESSION-2024-003</span>
+                        <span class="session-status status-ended">Terminée</span>
+                    </div>
+                    <div class="session-title">Examen Algorithmique</div>
+                    <div class="session-details">
+                        <span>📅 05 Déc 2024</span>
+                        <span>⏰ 09:00</span>
+                        <span>👥 52 candidats</span>
+                        <span>❓ 18 questions</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewResults(3)">Résultats</button>
+                        <button class="btn-small btn-secondary" onclick="exportResults(3)">Exporter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<script th:src="@{/js/dashboard.js}"></script>
+
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr"  xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Système d'Évaluation</title>
+    <link rel="stylesheet" th:href="@{/css/Home.css}">
+
+</head>
+
+<body>
+    <!-- Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+
+    <div class="sidebar candidat-sidebar" id="sidebar">
+        <h2>👨‍🎓 Candidat</h2>
+        <a href="#dashboard">🏠 Dashboard</a>
+        <a href="#sessions">📝 Mes Sessions</a>
+        <a href="#results">📊 Résultats</a>
+        <a href="/logout" class="logout">🚪 Déconnexion</a>
+    </div>
+    
+    <div class="main">
+        <div class="content-wrapper">
+            <div class="profile-card">
+                <div class="profile-avatar">MM</div>
+                <div class="profile-info">
+                    <div class="profile-name" th:text="${nomComplet}"></div>
+                    <div class="profile-email" th:text="${MyEmail}"></div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">15.5</div>
+                        <div class="stat-label">Moyenne</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="quick-actions">
+                <div class="action-card">
+                    <div class="action-icon blue">🎯</div>
+                    <div class="action-title">Rejoindre une Session</div>
+                    <div class="action-description">
+                        Entrez le code de la session pour commencer l'évaluation
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="sessionCode" placeholder="Code de la session" />
+                        <button onclick="joinSession()">Rejoindre</button>
+                    </div>
+                </div>
+    
+                <div class="action-card">
+                    <div class="action-icon green">📊</div>
+                    <div class="action-title">Mes Résultats</div>
+                    <div class="action-description">
+                        Consultez vos résultats des sessions précédentes
+                    </div>
+                    <button class="action-button" onclick="viewMyResults()">
+                        Voir Résultats
+                    </button>
+                </div>
+    
+                <div class="action-card">
+                    <div class="action-icon orange">📚</div>
+                    <div class="action-title">Historique</div>
+                    <div class="action-description">
+                        Accédez à l'historique complet de vos évaluations
+                    </div>
+                    <button class="action-button secondary" onclick="viewHistory()">
+                        Historique
+                    </button>
+                </div>
+            </div>
+    
+            <div class="sessions-section">
+                <div class="section-header">
+                    <h2 class="section-title">📝 Résultats Précédents</h2>
+                </div>
+    
+                <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">SESSION-2024-001</span>
+                        <span class="session-status status-ended">Terminée</span>
+                    </div>
+                    <div class="session-title">Examen de Programmation Java</div>
+                    <div class="session-details">
+                        <span>📅 05 Déc 2024</span>
+                        <span>⏰ 14:00</span>
+                        <span>✅ 18/20 points</span>
+                        <span>📊 Note: 18/20</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewDetailedResults(1)">Détails</button>
+                    </div>
+                </div>
+    
+                <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">SESSION-2024-002</span>
+                        <span class="session-status status-ended">Terminée</span>
+                    </div>
+                    <div class="session-title">Test Base de Données SQL</div>
+                    <div class="session-details">
+                        <span>📅 01 Déc 2024</span>
+                        <span>⏰ 10:00</span>
+                        <span>✅ 14/20 points</span>
+                        <span>📊 Note: 14/20</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewDetailedResults(2)">Détails</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+</body>
+<script th:src="@{/js/dashboard.js}"></script>
+
+</html>

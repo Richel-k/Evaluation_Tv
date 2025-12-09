@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier une Session</title>
+    <link rel="stylesheet" th:href="@{/css/Home.css}">
+</head>
+
+<body>
+    <!-- Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar examinateur-sidebar" id="sidebar">
+        <h2>👨‍🏫 Examinateur</h2>
+        <a th:href="@{/examinateur/dashboard}">🏠 Dashboard</a>
+        <a th:href="@{/examinateur/sessions}">📝 Mes Sessions</a>
+        <a th:href="@{/examinateur/create-session}">➕ Créer Session</a>
+        <a class="active" th:href="@{/examinateur/modifier-session}">✏️ Modifier Session</a>
+        <a href="/logout" class="logout">🚪 Déconnexion</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <div class="content-wrapper">
+            <!-- Header avec recherche -->
+            <div class="page-header">
+                <h1 class="page-title">✏️ Modifier une Session</h1>
+                <p class="page-subtitle">Modifiez ou mettez à jour une session existante</p>
+
+                <div class="search-container">
+                    <div class="input-group">
+                        <input type="text" id="search-session" placeholder="Rechercher par titre, ID ou code..."
+                            onkeyup="searchSessions()">
+                        <button onclick="loadSessionDetails()">🔍 Rechercher</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions disponibles -->
+            <div class="sessions-list-section">
+                <h3>📋 Mes Sessions Disponibles</h3>
+                <div class="sessions-grid" id="sessions-grid">
+                    <!-- Les sessions seront chargées ici dynamiquement -->
+                </div>
+            </div>
+
+            <!-- Form de modification (caché par défaut) -->
+            <div class="form-container" id="edit-form" style="display: none;">
+                <!-- En-tête avec infos session -->
+                <div class="session-info-header">
+                    <div class="session-badge">
+                        <span class="session-code" id="edit-session-code">SESSION-2024-001</span>
+                        <span class="session-status status-active" id="edit-session-status">En cours</span>
+                    </div>
+                    <h2 id="edit-session-title">Examen de Programmation Java</h2>
+                    <div class="session-meta" id="edit-session-meta">
+                        <span>📅 15 Déc 2024 à 14:00</span>
+                        <span>⏰ Durée: 60 min</span>
+                        <span>👥 45 candidats inscrits</span>
+                    </div>
+                </div>
+
+                <!-- Informations de Base -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <h3>📋 Modifier les Informations</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-title">Titre de la Session</label>
+                            <input type="text" id="edit-title" value="Examen de Programmation Java">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-description">Description</label>
+                            <textarea id="edit-description" rows="2">Examen sur les concepts avancés de Java</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-date">Date de la Session</label>
+                            <input type="date" id="edit-date" value="2024-12-15">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-time">Heure de Début</label>
+                            <input type="time" id="edit-time" value="14:00">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-duration">Durée (minutes)</label>
+                            <input type="number" id="edit-duration" value="60" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit-max-candidates">Candidats maximum</label>
+                            <input type="number" id="edit-max-candidates" value="50" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion des Participants -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="header-with-action">
+                            <h3>👥 Gestion des Participants</h3>
+                            <button type="button" class="btn-primary btn-small" onclick="exportParticipants()">
+                                📥 Exporter la liste
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="participants-table">
+                        <div class="table-header">
+                            <div class="col-name">Nom du Candidat</div>
+                            <div class="col-email">Email</div>
+                            <div class="col-status">Statut</div>
+                            <div class="col-actions">Actions</div>
+                        </div>
+
+                        <div class="table-body">
+                            <div class="table-row">
+                                <div class="col-name">Marie Martin</div>
+                                <div class="col-email">marie.martin@etudiant.fr</div>
+                                <div class="col-status">
+                                    <span class="status-badge status-active">Inscrit</span>
+                                </div>
+                                <div class="col-actions">
+                                    <button class="btn-danger btn-tiny" onclick="removeParticipant(1)">Retirer</button>
+                                </div>
+                            </div>
+                            <div class="table-row">
+                                <div class="col-name">Thomas Bernard</div>
+                                <div class="col-email">thomas.bernard@etudiant.fr</div>
+                                <div class="col-status">
+                                    <span class="status-badge status-completed">Terminé</span>
+                                </div>
+                                <div class="col-actions">
+                                    <button class="btn-primary btn-tiny" onclick="viewResults(1)">Résultats</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="add-participant">
+                        <div class="input-group">
+                            <input type="email" id="new-participant" placeholder="Email du candidat à ajouter...">
+                            <button onclick="addParticipant()">➕ Ajouter</button>
+                        </div>
+                        <small>Vous pouvez aussi importer une liste via CSV</small>
+                    </div>
+                </div>
+
+                <!-- Questions de la Session -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <div class="header-with-action">
+                            <h3>❓ Questions de la Session</h3>
+                            <button type="button" class="btn-primary btn-small" onclick="addQuestionToSession()">
+                                ➕ Ajouter Question
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="questions-summary">
+                        <div class="summary-stats">
+                            <div class="stat-card">
+                                <div class="stat-value" id="total-questions">8</div>
+                                <div class="stat-label">Questions</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="total-points">20</div>
+                                <div class="stat-label">Points totaux</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="avg-difficulty">Moyenne</div>
+                                <div class="stat-label">Difficulté</div>
+                            </div>
+                        </div>
+
+                        <div class="questions-list" id="session-questions">
+                            <!-- Questions seront chargées ici -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions de Modification -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <h3>⚙️ Actions de Session</h3>
+                    </div>
+
+                    <div class="action-buttons-grid">
+                        <button type="button" class="action-btn" onclick="duplicateSession()">
+                            <div class="action-icon">📋</div>
+                            <div class="action-content">
+                                <div class="action-title">Dupliquer la Session</div>
+                                <div class="action-desc">Créer une copie avec de nouveaux paramètres</div>
+                            </div>
+                        </button>
+
+                        <button type="button" class="action-btn" onclick="exportSession()">
+                            <div class="action-icon">📤</div>
+                            <div class="action-content">
+                                <div class="action-title">Exporter la Session</div>
+                                <div class="action-desc">Télécharger en format JSON ou CSV</div>
+                            </div>
+                        </button>
+
+                        <button type="button" class="action-btn btn-danger" onclick="archiveSession()">
+                            <div class="action-icon">🗄️</div>
+                            <div class="action-content">
+                                <div class="action-title">Archiver la Session</div>
+                                <div class="action-desc">Désactiver sans suppression définitive</div>
+                            </div>
+                        </button>
+
+                        <button type="button" class="action-btn btn-danger" onclick="deleteSession()">
+                            <div class="action-icon">🗑️</div>
+                            <div class="action-content">
+                                <div class="action-title">Supprimer Définitivement</div>
+                                <div class="action-desc">Attention : action irréversible</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="cancelEdit()">
+                        ← Annuler
+                    </button>
+                    <button type="button" class="btn-danger" onclick="resetChanges()">
+                        🔄 Annuler modifications
+                    </button>
+                    <button type="button" class="btn-primary" onclick="saveChanges()">
+                        💾 Sauvegarder les modifications
+                    </button>
+                    <button type="button" class="btn-primary" onclick="publishChanges()">
+                        🌐 Publier les modifications
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données de test
+        const sessions = [
+            {
+                id: 1,
+                code: "SESSION-2024-001",
+                title: "Examen de Programmation Java",
+                date: "2024-12-15",
+                time: "14:00",
+                duration: 60,
+                candidates: 45,
+                status: "active",
+                questions: 8
+            },
+            {
+                id: 2,
+                code: "SESSION-2024-002",
+                title: "Test Base de Données SQL",
+                date: "2024-12-20",
+                time: "10:00",
+                duration: 90,
+                candidates: 38,
+                status: "planned",
+                questions: 15
+            },
+            {
+                id: 3,
+                code: "SESSION-2024-003",
+                title: "Examen Algorithmique",
+                date: "2024-12-05",
+                time: "09:00",
+                duration: 120,
+                candidates: 52,
+                status: "ended",
+                questions: 18
+            }
+        ];
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function loadSessions() {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = '';
+
+            sessions.forEach(session => {
+                const sessionHTML = `
+                    <div class="session-card" onclick="loadSession(${session.id})">
+                        <div class="session-card-header">
+                            <span class="session-card-code">${session.code}</span>
+                            <span class="session-status status-${session.status}">
+                                ${session.status === 'active' ? 'En cours' :
+                        session.status === 'planned' ? 'Planifiée' : 'Terminée'}
+                            </span>
+                        </div>
+                        <h4 class="session-card-title">${session.title}</h4>
+                        <div class="session-card-meta">
+                            <span>📅 ${session.date}</span>
+                            <span>⏰ ${session.time}</span>
+                            <span>👥 ${session.candidates} candidats</span>
+                            <span>❓ ${session.questions} questions</span>
+                        </div>
+                        <div class="session-card-actions">
+                            <button class="btn-primary btn-small" onclick="event.stopPropagation(); loadSession(${session.id})">
+                                Modifier
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += sessionHTML;
+            });
+        }
+
+        function loadSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+
+            // Afficher le formulaire
+            document.getElementById('edit-form').style.display = 'block';
+
+            // Remplir les champs
+            document.getElementById('edit-session-code').textContent = session.code;
+            document.getElementById('edit-session-status').textContent =
+                session.status === 'active' ? 'En cours' :
+                    session.status === 'planned' ? 'Planifiée' : 'Terminée';
+            document.getElementById('edit-session-title').textContent = session.title;
+            document.getElementById('edit-title').value = session.title;
+            document.getElementById('edit-date').value = session.date;
+            document.getElementById('edit-time').value = session.time;
+            document.getElementById('edit-duration').value = session.duration;
+            document.getElementById('edit-max-candidates').value = session.candidates;
+
+            // Mettre à jour les métadonnées
+            document.getElementById('edit-session-meta').innerHTML = `
+                <span>📅 ${session.date} à ${session.time}</span>
+                <span>⏰ Durée: ${session.duration} min</span>
+                <span>👥 ${session.candidates} candidats inscrits</span>
+            `;
+
+            // Faire défiler vers le formulaire
+            document.getElementById('edit-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function loadSessionDetails() {
+            const search = document.getElementById('search-session').value.toLowerCase();
+            if (search) {
+                const foundSession = sessions.find(s =>
+                    s.title.toLowerCase().includes(search) ||
+                    s.code.toLowerCase().includes(search)
+                );
+
+                if (foundSession) {
+                    loadSession(foundSession.id);
+                } else {
+                    alert('Aucune session trouvée avec ces critères.');
+                }
+            }
+        }
+
+        function searchSessions() {
+            const search = document.getElementById('search-session').value.toLowerCase();
+            const grid = document.getElementById('sessions-grid');
+            const cards = grid.querySelectorAll('.session-card');
+
+            cards.forEach(card => {
+                const title = card.querySelector('.session-card-title').textContent.toLowerCase();
+                const code = card.querySelector('.session-card-code').textContent.toLowerCase();
+
+                if (title.includes(search) || code.includes(search)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function cancelEdit() {
+            document.getElementById('edit-form').style.display = 'none';
+        }
+
+        function resetChanges() {
+            if (confirm('Annuler toutes les modifications ?')) {
+                // Recharger les données originales
+                const currentSessionId = 1; // À remplacer par l'ID réel
+                loadSession(currentSessionId);
+            }
+        }
+
+        function saveChanges() {
+            alert('Modifications sauvegardées avec succès !');
+            // Ici: Logique pour sauvegarder dans la base de données
+        }
+
+        function publishChanges() {
+            if (confirm('Publier les modifications ? Tous les participants seront notifiés.')) {
+                alert('Modifications publiées !');
+                // Ici: Logique pour publier les changements
+            }
+        }
+
+        function addParticipant() {
+            const email = document.getElementById('new-participant').value;
+            if (email && email.includes('@')) {
+                alert(`Candidat ${email} ajouté avec succès !`);
+                document.getElementById('new-participant').value = '';
+            } else {
+                alert('Veuillez entrer un email valide.');
+            }
+        }
+
+        function removeParticipant(id) {
+            if (confirm('Retirer ce candidat de la session ?')) {
+                alert('Candidat retiré.');
+            }
+        }
+
+        function addQuestionToSession() {
+            alert('Redirection vers l\'éditeur de questions...');
+            // Ici: Ouvrir un modal ou rediriger
+        }
+
+        function duplicateSession() {
+            if (confirm('Dupliquer cette session ?')) {
+                alert('Session dupliquée ! Une nouvelle session a été créée.');
+            }
+        }
+
+        function exportSession() {
+            alert('Exportation de la session...');
+            // Ici: Logique d'export
+        }
+
+        function archiveSession() {
+            if (confirm('Archiver cette session ? Elle ne sera plus accessible aux candidats.')) {
+                alert('Session archivée.');
+            }
+        }
+
+        function deleteSession() {
+            if (confirm('⚠️ Attention ! Cette action est irréversible.\n\nSupprimer définitivement cette session ?')) {
+                alert('Session supprimée.');
+                cancelEdit();
+                loadSessions();
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSessions();
+        });
+    </script>
+</body>
+
+</html>

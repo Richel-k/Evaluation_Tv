@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion</title>
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+  <div class="auth-container">
+    <form th:action="@{/login}" method="post" class="auth-form">
+      <h2>Connexion</h2>
+
+      <label for="name">Nom de l'utilsateur</label>
+      <input type="name" id="username" name="username" required>
+
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" name="password" required autocomplete="off">
+      <br>
+      <div th:if="${param.error}">
+        <p style="color: red;">Identifiants incorrects.</p>
+      </div>
+
+      
+      <button type="submit">Se connecter</button>
+
+
+      <p class="link">Pas encore inscrit ? <a href="/">Créer un compte</a></p>
+    </form>
+  </div>
+</body>
+</html>
+
