@@ -1,6 +1,7 @@
 // SessionResponseDTO.java
 package com.Application.EvaluationTV.dto;
 
+import com.Application.EvaluationTV.model.Enum.StatutSession;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -15,10 +16,10 @@ public class SessionResponseDTO {
     private LocalDateTime dateSession;
 
     private Integer dureeMinutes;
-    private String statut;
+    private StatutSession statut;
     private Integer nombreQuestions;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dateDebut;
 
     private String examinateurNom;

@@ -15,6 +15,6 @@ public class ReponseRequestDTO {
     @NotNull(message = "La validité de la réponse est obligatoire")
     private Boolean correcte;
 
-    @NotNull(message = "L'ordre de la réponse est obligatoire")
-    private Integer ordre;
+    // @NotNull(message = "L'ordre de la réponse est obligatoire")
+    // private Integer ordre;
 }

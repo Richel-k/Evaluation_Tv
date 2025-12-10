@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.Application.EvaluationTV.model.*;
 //import com.evaluation.model.Examinateur;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @NoArgsConstructor
@@ -32,8 +34,9 @@ public class Session {
     @Column(length = 1000)
     private String description;
 
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @Column(nullable = false)
-    private LocalDate dateDebut;
+    private LocalDateTime dateDebut;
 
     @Column(nullable = false)
     private LocalTime heureDebut;
@@ -66,5 +69,9 @@ public class Session {
     public void retirerQuestion(Question question) {
         questions.remove(question);
         question.setSession(null);
+    }
+
+    public String getNomComplet(){
+        return this.getExaminateur().getPrenom() + " " + this.getExaminateur().getUsername();
     }
 }

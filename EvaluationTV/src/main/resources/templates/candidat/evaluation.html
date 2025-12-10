@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation en cours - Session </title>
+    <link rel="stylesheet" th:href="@{/css/evaluation.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header avec infos de session -->
+    <header class="evaluation-header">
+        <div class="header-left">
+            <div class="session-info">
+                <h1>📝 Évaluation en cours</h1>
+                <div class="session-details">
+                    <span class="session-code">Session: <strong th:text="${sessionCode}">ABC123</strong></span>
+                    <span class="session-title" th:text="${sessionTitle}">Examen de Programmation Java</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <!-- Timer principal -->
+            <div class="timer-container">
+                <div class="timer-display">
+                    <i class="fas fa-clock"></i>
+                    <span id="globalTimer">00:00</span>
+                </div>
+                <div class="timer-label">Temps total</div>
+            </div>
+
+            <!-- Timer par question -->
+            <div class="question-timer-container">
+                <div class="question-timer-display">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span id="questionTimer">30s</span>
+                </div>
+                <div class="timer-label">Question actuelle</div>
+            </div>
+
+            <!-- Progression -->
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span id="currentQuestion">1</span> / <span id="totalQuestions"
+                        th:text="${totalQuestions}">20</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="timer-label">Progression</div>
+            </div>
+
+            <!-- Candidat info -->
+            <div class="candidate-info">
+                <div class="candidate-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="candidate-details">
+                    <div class="candidate-name" th:text="${candidateName}">Jean Dupont</div>
+                    <div class="candidate-id" th:text="${candidateId}">ETU001</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="evaluation-container">
+        <!-- Barre de navigation des questions (cachée si pas de retour arrière) -->
+        <nav class="question-nav" id="questionNav" style="display: none;">
+            <div class="nav-header">
+                <h3><i class="fas fa-list-ol"></i> Navigation des questions</h3>
+                <small class="nav-note">⚠️ Attention : Pas de retour possible</small>
+            </div>
+            <div class="question-dots" id="questionDots">
+                <!-- Les points seront générés dynamiquement -->
+            </div>
+        </nav>
+
+        <!-- Zone de la question -->
+        <div class="question-container" id="questionContainer">
+            <!-- En-tête de la question -->
+            <div class="question-header">
+                <div class="question-meta">
+                    <span class="question-number">Question <span id="displayQuestionNumber">1</span></span>
+                    <span class="question-points" id="questionPoints">2 points</span>
+                    <span class="question-difficulty" id="questionDifficulty">Moyenne</span>
+                </div>
+
+                <!-- Timer circulaire pour la question -->
+                <div class="circular-timer">
+                    <div class="timer-circle">
+                        <svg width="80" height="80" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" class="timer-background"></circle>
+                            <circle cx="50" cy="50" r="45" class="timer-progress" id="timerCircle"></circle>
+                        </svg>
+                        <div class="timer-text" id="circularTimerText">30s</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Énoncé de la question -->
+            <div class="question-body">
+                <div class="question-statement" id="questionStatement">
+                    <p>Quelle est la complexité temporelle de l'algorithme QuickSort dans le pire des cas ?</p>
+                </div>
+
+                <!-- Indicateur de type de question -->
+                <div class="question-type-indicator" id="questionTypeIndicator">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Choix multiple (une seule réponse correcte)</span>
+                </div>
+            </div>
+
+            <!-- Réponses -->
+            <div class="answers-container" id="answersContainer">
+                <!-- Les réponses seront générées dynamiquement -->
+            </div>
+
+            <!-- Zone d'instructions -->
+            <div class="instructions-panel">
+                <div class="instructions-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h4>Instructions importantes</h4>
+                </div>
+                <ul class="instructions-list">
+                    <li><i class="fas fa-ban"></i> <strong>Pas de retour arrière</strong> : Vous ne pouvez pas revenir
+                        aux questions précédentes</li>
+                    <li><i class="fas fa-clock"></i> <strong>Temps limité</strong> : 30 secondes par question maximum
+                    </li>
+                    <li><i class="fas fa-forward"></i> <strong>Passage automatique</strong> : La question suivante
+                        s'affiche automatiquement après 30 secondes</li>
+                    <li><i class="fas fa-mouse-pointer"></i> <strong>Sélection unique</strong> : Cliquez sur une réponse
+                        pour la sélectionner</li>
+                    <li><i class="fas fa-save"></i> <strong>Sauvegarde automatique</strong> : Votre réponse est
+                        enregistrée automatiquement</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Zone de contrôle -->
+        <div class="control-container">
+            <!-- Confirmation de réponse -->
+            <div class="answer-confirmation" id="answerConfirmation" style="display: none;">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="confirmation-text">
+                    <strong>Réponse enregistrée !</strong>
+                    <p>Passage à la question suivante dans <span id="nextQuestionCountdown">3</span> secondes...</p>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="action-buttons">
+                <button class="btn-secondary" id="flagBtn" onclick="toggleFlag()">
+                    <i class="far fa-flag"></i> Marquer la question
+                </button>
+
+                <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    <i class="fas fa-forward"></i> Question suivante
+                </button>
+
+                <button class="btn-danger" id="endBtn" onclick="showConfirmationModal()">
+                    <i class="fas fa-stop-circle"></i> Terminer l'évaluation
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de confirmation de fin -->
+    <div class="modal-overlay" id="confirmationModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmation de fin d'évaluation</h3>
+                <button class="modal-close" onclick="closeConfirmationModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="warning-icon">
+                    <i class="fas fa-hourglass-end"></i>
+                </div>
+
+                <h4>Êtes-vous sûr de vouloir terminer l'évaluation ?</h4>
+
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="answeredCount">0</div>
+                        <div class="stat-label">Répondues</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="remainingCount">0</div>
+                        <div class="stat-label">Restantes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="elapsedTime">00:00</div>
+                        <div class="stat-label">Temps écoulé</div>
+                    </div>
+                </div>
+
+                <div class="warning-message">
+                    <p><strong>Attention :</strong> Cette action est irréversible. Vous ne pourrez plus modifier vos
+                        réponses.</p>
+                    <p>Les questions non répondues seront comptées comme fausses.</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfirmationModal()">
+                    <i class="fas fa-arrow-left"></i> Continuer l'évaluation
+                </button>
+                <button class="btn-danger" onclick="endEvaluation()">
+                    <i class="fas fa-stop-circle"></i> Terminer et soumettre
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de fin d'évaluation -->
+    <div class="modal-overlay" id="completionModal" style="display: none;">
+        <div class="modal-content success">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle"></i> Évaluation terminée</h3>
+            </div>
+
+            <div class="modal-body">
+                <div class="success-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+
+                <h4>Félicitations ! Vous avez terminé l'évaluation</h4>
+
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <div class="final-value" id="finalScore">0</div>
+                        <div class="final-label">Points obtenus</div>
+                    </div>
+                    <div class="final-stat">
+                        <div class="final-value" id="finalPercentage">0%</div>
+                        <div class="final-label">Score</div>
+                    </div>
+                    <div class="final-stat">
+                        <div class="final-value" id="finalTime">00:00</div>
+                        <div class="final-label">Durée totale</div>
+                    </div>
+                </div>
+
+                <div class="completion-message">
+                    <p>Vos résultats seront disponibles après correction par l'examinateur.</p>
+                    <p>Vous recevrez une notification par email dès que les résultats seront publiés.</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="redirectToDashboard()">
+                    <i class="fas fa-home"></i> Retour au dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio pour les alertes (silencieux par défaut) -->
+    <audio id="tickSound" preload="auto">
+        <source th:src="@{/sounds/tick.mp3}" type="audio/mpeg">
+    </audio>
+    <audio id="timesUpSound" preload="auto">
+        <source th:src="@{/sounds/times-up.mp3}" type="audio/mpeg">
+    </audio>
+    <audio id="nextQuestionSound" preload="auto">
+        <source th:src="@{/sounds/next-question.mp3}" type="audio/mpeg">
+    </audio>
+
+    <script th:src="@{/js/evaluation.js}"></script>
+    <script>
+        // Configuration initiale
+        const evaluationConfig = {
+            sessionId: /*[[${sessionId}]]*/ '1',
+            totalQuestions: /*[[${totalQuestions}]]*/ 20,
+            timePerQuestion: 30, // secondes
+            allowBacktracking: false,
+            shuffleAnswers: /*[[${shuffleAnswers}]]*/ false,
+            showTimer: true
+        };
+    </script>
+</body>
+
+<script th:src="@{/js/evaluation.js}"></script>
+
+</html>

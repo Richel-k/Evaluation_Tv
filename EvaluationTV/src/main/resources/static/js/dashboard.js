@@ -10,6 +10,7 @@ function toggleSidebar() {
 // Examinateur Functions
 function createSession() {
     alert('Redirection vers la page de création de session...');
+    window.location.href = "/examinateur/create-session"
     // window.location.href = '/examinateur/creer-session';
 }
 
@@ -65,7 +66,7 @@ function joinSession() {
     const code = document.getElementById('sessionCode').value;
     if (code) {
         alert(`Connexion à la session: ${code}`);
-        // window.location.href = `/candidat/session/${code}`;
+        window.location.href = `/candidat/session/evaluation/${code}`;
     } else {
         alert('Veuillez entrer un code de session');
     }

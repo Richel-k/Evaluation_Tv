@@ -34,9 +34,9 @@ public class SessionRequestDTO {
     @Max(value = 300, message = "La durée maximale est 300 minutes")
     private Integer dureeMinutes;
 
-    @Min(value = 1, message = "Le nombre minimum de candidats est 1")
-    @Max(value = 500, message = "Le nombre maximum de candidats est 500")
-    private Integer nombreMaxCandidats;
+    // @Min(value = 1, message = "Le nombre minimum de candidats est 1")
+    // @Max(value = 500, message = "Le nombre maximum de candidats est 500")
+    // private Integer nombreMaxCandidats;
 
     @Min(value = 0, message = "Le score de réussite doit être entre 0 et 100")
     @Max(value = 100, message = "Le score de réussite doit être entre 0 et 100")

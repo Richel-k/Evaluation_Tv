@@ -33,10 +33,11 @@ public class SessionService {
         Session session = new Session();
         session.setTitre(sessionRequest.getTitre());
         session.setDescription(sessionRequest.getDescription());
-        session.setDateSession(sessionRequest.getDateSession().atTime(sessionRequest.getHeureDebut()));
-        session.setDureeMinutes(sessionRequest.getDureeMinutes());
-        session.setNombreMaxCandidats(sessionRequest.getNombreMaxCandidats());
-        session.setScoreReussite(sessionRequest.getScoreReussite());
+        //session.setDateDebut(sessionRequest.getDateSession().atTime(sessionRequest.getHeureDebut()));
+        session.setHeureDebut(sessionRequest.getHeureDebut()); 
+        //session.setDureeMinutes(sessionRequest.getDureeMinutes());
+        //session.setNombreMaxCandidats(sessionRequest.getNombreMaxCandidats());
+        //session.setScoreReussite(sessionRequest.getScoreReussite());
         //session.setOrdreQuestions(sessionRequest.getOrdreQuestions());
         //session.setVisibiliteResultats(sessionRequest.getVisibiliteResultats());
         //session.setRetourArriereAutorise(sessionRequest.isRetourArriereAutorise());
@@ -47,6 +48,7 @@ public class SessionService {
         session.setStatut(StatutSession.PLANIFIEE);
         session.setDateDebut(LocalDateTime.now());
 
+
         // Sauvegarder la session
         Session savedSession = sessionRepository.save(session);
 
@@ -56,30 +58,31 @@ public class SessionService {
         for (QuestionRequestDTO questionDto : sessionRequest.getQuestions()) {
             Question question = new Question();
             question.setEnonce(questionDto.getEnonce());
-            question.setTypeQuestion(questionDto.getTypeQuestion());
+            //question.setTypeQuestion(questionDto.getTypeQuestion());
             question.setPoints(questionDto.getPoints());
-            question.setDifficulte(questionDto.getDifficulte());
-            question.setNumero(questionDto.getNumero());
+            //question.setDifficulte(questionDto.getDifficulte());
+            //question.setNumero(questionDto.getNumero());
+            question.setTime(questionDto.getTime());
             question.setSession(savedSession);
 
             Question savedQuestion = questionRepository.save(question);
 
             // Créer les réponses si nécessaire
             if (questionDto.getReponses() != null && !questionDto.getReponses().isEmpty()) {
-                List<Reponse> reponses = new ArrayList<>();
+                List<OptionReponse> reponses = new ArrayList<>();
 
                 for (ReponseRequestDTO reponseDto : questionDto.getReponses()) {
-                    Reponse reponse = new Reponse();
+                    OptionReponse reponse = new OptionReponse();
                     reponse.setTexte(reponseDto.getTexte());
-                    reponse.setCorrecte(reponseDto.getCorrecte());
-                    reponse.setOrdre(reponseDto.getOrdre());
+                    reponse.setEstCorrecte(reponseDto.getCorrecte());
+                    //reponse.setOrdre(reponseDto.getOrdre());
                     reponse.setQuestion(savedQuestion);
 
                     reponses.add(reponse);
                 }
 
                 reponseRepository.saveAll(reponses);
-                savedQuestion.setReponses(reponses);
+                savedQuestion.setOptions(reponses);
             }
 
             questions.add(savedQuestion);
@@ -101,13 +104,13 @@ public class SessionService {
         dto.setId(session.getId());
         dto.setTitre(session.getTitre());
         dto.setCodeSession(session.getCode());
-        dto.setDateDebut(session.getDateDebut());
+        //dto.setDateDebut(session.getDateDebut());
         dto.setDureeMinutes(session.getDureeMinutes());
         dto.setStatut(session.getStatut());
         dto.setNombreQuestions(session.getQuestions() != null ? session.getQuestions().size() : 0);
-        dto.setDateCreation(session.getDateCreation());
-        dto.setExaminateurNom(session.getExaminateur().getNomComplet());
-        dto.setExaminateurEmail(session.getExaminateur().getEmail());
+        dto.setDateDebut(session.getDateDebut());
+        // dto.setExaminateurNom(session.getExaminateur().getNomComplet());
+        // dto.setExaminateurEmail(session.getExaminateur().getEmail());
 
         return dto;
     }

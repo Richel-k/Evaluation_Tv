@@ -21,7 +21,7 @@
     <div class="sidebar examinateur-sidebar" id="sidebar">
         <h2>👨‍🏫 Examinateur</h2>
         <a th:href="@{/examinateur/dashboard}">🏠 Dashboard</a>
-        <a th:href="@{/examinateur/sessions}">📝 Mes Sessions</a>
+        <a th:href="@{/examinateur/update-session}">📝 Mes Sessions</a>
         <a class="active" th:href="@{/examinateur/creer-session}">➕ Créer Session</a>
         <a href="#stats">📊 Statistiques</a>
         <a href="/logout" class="logout">🚪 Déconnexion</a>
@@ -171,12 +171,13 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Difficulté</label>
-                                    <select class="question-difficulty">
+                                    <label>Durée - Question</label>
+                                    <input type="time" name="duree-question" class="question-duration">
+                                    <!-- <select class="question-difficulty">
                                         <option value="easy">Facile</option>
                                         <option value="medium" selected>Moyenne</option>
                                         <option value="hard">Difficile</option>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
 
@@ -255,12 +256,12 @@
 
                         <div class="form-group">
                             <label>Type de Question</label>
-                            <select class="question-type" onchange="toggleAnswersSection(${questionCounter})">
-                                <option value="multiple">Choix multiple</option>
-                                <option value="single">Choix unique</option>
-                                <option value="truefalse">Vrai/Faux</option>
-                                <option value="text">Réponse texte</option>
-                            </select>
+                                <select class="question-type">
+                                    <option value="multiple">Choix multiple</option>
+                                    <option value="single">Choix unique</option>
+                                    <option value="truefalse">Vrai/Faux</option>
+                                    <option value="text">Réponse texte</option>
+                                </select>
                         </div>
 
                         <div class="form-group">
@@ -269,12 +270,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Difficulté</label>
-                            <select class="question-difficulty">
-                                <option value="easy">Facile</option>
-                                <option value="medium" selected>Moyenne</option>
-                                <option value="hard">Difficile</option>
-                            </select>
+                            <label>Durée - Question</label>
+                            <input type="time" name="duree-question" class="question-duration">
                         </div>
                     </div>
 
@@ -351,22 +348,10 @@
             }
         }
 
-        function createSession() {
-            // Validation et création de la session
-            const title = document.getElementById('session-title').value;
-            if (!title) {
-                alert('Veuillez saisir un titre pour la session.');
-                return;
-            }
-
-            // Simulation de création
-            alert(`Session "${title}" créée avec succès !`);
 
 
-            //Ici on va utiliser fetch("")
-            // Redirection vers le dashboard
-            window.location.href = '/dashboard';
-        }
+
+
 
         function saveDraft() {
             alert('Brouillon sauvegardé !');
@@ -385,179 +370,179 @@
 
 
         async function createSession() {
-                // Validation des champs obligatoires
-                const title = document.getElementById('session-title').value;
-                if (!title) {
-                    alert('Veuillez saisir un titre pour la session.');
-                    return;
+            // Validation des champs obligatoires
+            const title = document.getElementById('session-title').value;
+            if (!title) {
+                alert('Veuillez saisir un titre pour la session.');
+                return;
+            }
+
+            // Collecte des données de la session
+            const sessionData = {
+                titre: title,
+                description: document.getElementById('session-description').value,
+                dateSession: document.getElementById('session-date').value,
+                heureDebut: document.getElementById('session-time').value,
+                dureeMinutes: parseInt(document.getElementById('session-duration').value),
+                //nombreMaxCandidats: parseInt(document.getElementById('session-max-candidates').value) || 60, //Test de creétaions sessions
+                scoreReussite: parseInt(document.getElementById('passing-score').value) || 60,
+                ordreQuestions: document.getElementById('question-order').value,
+                visibiliteResultats: document.getElementById('result-visibility').value,
+                retourArriereAutorise: document.getElementById('allow-backtracking').checked,
+                melangerReponses: document.getElementById('shuffle-answers').checked,
+                tempsParQuestion: document.getElementById('time-per-question').checked,
+                questions: collectQuestions()
+            };
+
+            // Vérification qu'il y a au moins une question
+            if (sessionData.questions.length === 0) {
+                alert('Veuillez ajouter au moins une question à la session.');
+                return;
+            }
+
+            // Vérification des réponses pour les questions à choix
+            if (!validateQuestions(sessionData.questions)) {
+                return;
+            }
+
+            try {
+                // Afficher un indicateur de chargement
+                showLoading();
+
+                // Envoi des données au backend Spring Boot
+                const response = await fetch('/api/sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Ajouter le token d'authentification si nécessaire
+                        // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(sessionData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erreur lors de la création de la session');
                 }
 
-                // Collecte des données de la session
-                const sessionData = {
-                    titre: title,
-                    description: document.getElementById('session-description').value,
-                    dateSession: document.getElementById('session-date').value,
-                    heureDebut: document.getElementById('session-time').value,
-                    dureeMinutes: parseInt(document.getElementById('session-duration').value),
-                    nombreMaxCandidats: parseInt(document.getElementById('session-max-candidats').value) || null,
-                    scoreReussite: parseInt(document.getElementById('passing-score').value) || 60,
-                    ordreQuestions: document.getElementById('question-order').value,
-                    visibiliteResultats: document.getElementById('result-visibility').value,
-                    retourArriereAutorise: document.getElementById('allow-backtracking').checked,
-                    melangerReponses: document.getElementById('shuffle-answers').checked,
-                    tempsParQuestion: document.getElementById('time-per-question').checked,
-                    questions: collectQuestions()
+                const result = await response.json();
+
+                // Afficher le message de succès
+                hideLoading();
+                alert(`Session "${result.titre}" créée avec succès avec le code : ${result.codeSession}`);
+
+                // Redirection vers le dashboard ou les détails de la session
+                window.location.href = `/examinateur/dashboard`;
+
+            } catch (error) {
+                hideLoading();
+                console.error('Erreur:', error);
+                alert(`Erreur: ${error.message}`);
+            }
+        }
+
+        function collectQuestions() {
+            const questions = [];
+            const questionItems = document.querySelectorAll('.question-item');
+
+            questionItems.forEach((questionItem, index) => {
+                const question = {
+                    numero: index + 1,
+                    enonce: questionItem.querySelector('.question-text').value,
+                    typeQuestion: questionItem.querySelector('.question-type').value,
+                    points: parseFloat(questionItem.querySelector('.question-points').value) || 1,
+                    time: questionItem.querySelector('.question-duration').value,
+                    reponses: collectReponses(questionItem)
                 };
 
-                // Vérification qu'il y a au moins une question
-                if (sessionData.questions.length === 0) {
-                    alert('Veuillez ajouter au moins une question à la session.');
-                    return;
-                }
+                questions.push(question);
+            });
 
-                // Vérification des réponses pour les questions à choix
-                if (!validateQuestions(sessionData.questions)) {
-                    return;
-                }
+            return questions;
+        }
 
-                try {
-                    // Afficher un indicateur de chargement
-                    showLoading();
+        function collectReponses(questionItem) {
+            const reponses = [];
+            const answerItems = questionItem.querySelectorAll('.answer-item');
 
-                    // Envoi des données au backend Spring Boot
-                    const response = await fetch('/api/sessions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // Ajouter le token d'authentification si nécessaire
-                            // 'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: JSON.stringify(sessionData)
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Erreur lors de la création de la session');
-                    }
-
-                    const result = await response.json();
-
-                    // Afficher le message de succès
-                    hideLoading();
-                    alert(`Session "${result.titre}" créée avec succès avec le code : ${result.codeSession}`);
-
-                    // Redirection vers le dashboard ou les détails de la session
-                    window.location.href = `/examinateur/sessions/${result.id}`;
-
-                } catch (error) {
-                    hideLoading();
-                    console.error('Erreur:', error);
-                    alert(`Erreur: ${error.message}`);
-                }
-            }
-
-            function collectQuestions() {
-                const questions = [];
-                const questionItems = document.querySelectorAll('.question-item');
-
-                questionItems.forEach((questionItem, index) => {
-                    const question = {
-                        numero: index + 1,
-                        enonce: questionItem.querySelector('.question-text').value,
-                        typeQuestion: questionItem.querySelector('.question-type').value,
-                        points: parseFloat(questionItem.querySelector('.question-points').value) || 1,
-                        difficulte: questionItem.querySelector('.question-difficulty').value,
-                        reponses: collectReponses(questionItem)
-                    };
-
-                    questions.push(question);
-                });
-
-                return questions;
-            }
-
-            function collectReponses(questionItem) {
-                const reponses = [];
-                const answerItems = questionItem.querySelectorAll('.answer-item');
-
-                // Pour les questions texte, pas de réponses prédéfinies
-                const questionType = questionItem.querySelector('.question-type').value;
-                if (questionType === 'text') {
-                    return reponses;
-                }
-
-                answerItems.forEach((answerItem, index) => {
-                    const reponse = {
-                        texte: answerItem.querySelector('.answer-text').value,
-                        correcte: answerItem.querySelector('.answer-correct').checked,
-                        ordre: index + 1
-                    };
-
-                    reponses.push(reponse);
-                });
-
+            // Pour les questions texte, pas de réponses prédéfinies
+            const questionType = questionItem.querySelector('.question-type').value;
+            if (questionType === 'text') {
                 return reponses;
             }
 
-            function validateQuestions(questions) {
-                for (const question of questions) {
-                    // Validation de l'énoncé
-                    if (!question.enonce || question.enonce.trim() === '') {
-                        alert(`La question ${question.numero} doit avoir un énoncé.`);
+            answerItems.forEach((answerItem, index) => {
+                const reponse = {
+                    texte: answerItem.querySelector('.answer-text').value,
+                    correcte: answerItem.querySelector('.answer-correct').checked,
+                    ordre: index + 1
+                };
+
+                reponses.push(reponse);
+            });
+
+            return reponses;
+        }
+
+        function validateQuestions(questions) {
+            for (const question of questions) {
+                // Validation de l'énoncé
+                if (!question.enonce || question.enonce.trim() === '') {
+                    alert(`La question ${question.numero} doit avoir un énoncé.`);
+                    return false;
+                }
+
+                // Validation des points
+                if (question.points <= 0) {
+                    alert(`La question ${question.numero} doit avoir un nombre de points positif.`);
+                    return false;
+                }
+
+                // Validation des réponses pour les questions à choix
+                if (question.typeQuestion !== 'text') {
+                    if (question.reponses.length === 0) {
+                        alert(`La question ${question.numero} doit avoir au moins une réponse.`);
                         return false;
                     }
 
-                    // Validation des points
-                    if (question.points <= 0) {
-                        alert(`La question ${question.numero} doit avoir un nombre de points positif.`);
-                        return false;
-                    }
-
-                    // Validation des réponses pour les questions à choix
-                    if (question.typeQuestion !== 'text') {
-                        if (question.reponses.length === 0) {
-                            alert(`La question ${question.numero} doit avoir au moins une réponse.`);
+                    // Validation des textes de réponse
+                    for (const reponse of question.reponses) {
+                        if (!reponse.texte || reponse.texte.trim() === '') {
+                            alert(`La question ${question.numero} a une réponse vide.`);
                             return false;
                         }
+                    }
 
-                        // Validation des textes de réponse
-                        for (const reponse of question.reponses) {
-                            if (!reponse.texte || reponse.texte.trim() === '') {
-                                alert(`La question ${question.numero} a une réponse vide.`);
-                                return false;
-                            }
+                    // Validation: au moins une réponse correcte pour les questions à choix
+                    if (question.typeQuestion === 'single' || question.typeQuestion === 'multiple') {
+                        const hasCorrectAnswer = question.reponses.some(r => r.correcte);
+                        if (!hasCorrectAnswer) {
+                            alert(`La question ${question.numero} doit avoir au moins une réponse correcte.`);
+                            return false;
                         }
+                    }
 
-                        // Validation: au moins une réponse correcte pour les questions à choix
-                        if (question.typeQuestion === 'single' || question.typeQuestion === 'multiple') {
-                            const hasCorrectAnswer = question.reponses.some(r => r.correcte);
-                            if (!hasCorrectAnswer) {
-                                alert(`La question ${question.numero} doit avoir au moins une réponse correcte.`);
-                                return false;
-                            }
-                        }
-
-                        // Validation: une seule réponse correcte pour les questions à choix unique
-                        if (question.typeQuestion === 'single') {
-                            const correctAnswers = question.reponses.filter(r => r.correcte);
-                            if (correctAnswers.length > 1) {
-                                alert(`La question ${question.numero} (choix unique) ne peut avoir qu'une seule réponse correcte.`);
-                                return false;
-                            }
+                    // Validation: une seule réponse correcte pour les questions à choix unique
+                    if (question.typeQuestion === 'single') {
+                        const correctAnswers = question.reponses.filter(r => r.correcte);
+                        if (correctAnswers.length > 1) {
+                            alert(`La question ${question.numero} (choix unique) ne peut avoir qu'une seule réponse correcte.`);
+                            return false;
                         }
                     }
                 }
-
-                return true;
             }
 
-            function showLoading() {
-                // Créer ou afficher un overlay de chargement
-                let loadingOverlay = document.getElementById('loading-overlay');
-                if (!loadingOverlay) {
-                    loadingOverlay = document.createElement('div');
-                    loadingOverlay.id = 'loading-overlay';
-                    loadingOverlay.style.cssText = `
+            return true;
+        }
+
+        function showLoading() {
+            // Créer ou afficher un overlay de chargement
+            let loadingOverlay = document.getElementById('loading-overlay');
+            if (!loadingOverlay) {
+                loadingOverlay = document.createElement('div');
+                loadingOverlay.id = 'loading-overlay';
+                loadingOverlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -571,8 +556,8 @@
             z-index: 9999;
         `;
 
-                    const spinner = document.createElement('div');
-                    spinner.style.cssText = `
+                const spinner = document.createElement('div');
+                spinner.style.cssText = `
             width: 50px;
             height: 50px;
             border: 5px solid #f3f3f3;
@@ -581,42 +566,42 @@
             animation: spin 1s linear infinite;
         `;
 
-                    const text = document.createElement('p');
-                    text.textContent = 'Création de la session en cours...';
-                    text.style.cssText = `
+                const text = document.createElement('p');
+                text.textContent = 'Création de la session en cours...';
+                text.style.cssText = `
             margin-top: 20px;
             font-size: 16px;
             color: #3b82f6;
             font-weight: 600;
         `;
 
-                    loadingOverlay.appendChild(spinner);
-                    loadingOverlay.appendChild(text);
-                    document.body.appendChild(loadingOverlay);
-                }
+                loadingOverlay.appendChild(spinner);
+                loadingOverlay.appendChild(text);
+                document.body.appendChild(loadingOverlay);
+            }
 
-                loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.display = 'flex';
 
-                // Ajouter l'animation CSS si nécessaire
-                if (!document.getElementById('loading-styles')) {
-                    const style = document.createElement('style');
-                    style.id = 'loading-styles';
-                    style.textContent = `
+            // Ajouter l'animation CSS si nécessaire
+            if (!document.getElementById('loading-styles')) {
+                const style = document.createElement('style');
+                style.id = 'loading-styles';
+                style.textContent = `
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
         `;
-                    document.head.appendChild(style);
-                }
+                document.head.appendChild(style);
             }
+        }
 
-            function hideLoading() {
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.display = 'none';
-                }
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
             }
+        }
     </script>
 </body>
 

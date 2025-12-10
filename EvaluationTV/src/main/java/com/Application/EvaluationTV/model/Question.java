@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +29,13 @@ public class Question {
 
     private Integer points; // Points attribués à cette question
 
-    private Integer ordre; // Ordre d'affichage dans la session
+    @Column(nullable = false)
+    private LocalTime time;
 
-    @Column(length = 2000)
-    private String explication; // Explication de la réponse correcte
+    //private Integer ordre; // Ordre d'affichage dans la session
+
+    // @Column(length = 2000)
+    // private String explication; // Explication de la réponse correcte
 
     @ManyToOne
     @JoinColumn(name = "session_id", nullable = false)
