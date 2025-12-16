@@ -8,6 +8,7 @@ import com.Application.EvaluationTV.model.ReponseCandidat;
 import com.Application.EvaluationTV.model.Session;
 import com.Application.EvaluationTV.repository.CandidatRepository;
 import com.Application.EvaluationTV.repository.QuestionRepository;
+import com.Application.EvaluationTV.repository.ReponseCandidatRepository;
 import com.Application.EvaluationTV.repository.ReponseRepository;
 import com.Application.EvaluationTV.repository.SessionRepository;
 import com.Application.EvaluationTV.security.CustomUserDetails;
@@ -31,6 +32,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -45,6 +49,8 @@ public class SessionController {
     private final ReponseRepository reponseRepository;
     private final QuestionRepository questionRepository;
     private final CandidatRepository candidatRepository;
+    private final ReponseCandidatRepository reponseCandidatRepository;
+
     @PostMapping
     public ResponseEntity<SessionResponseDTO> createSession(
             @Valid @RequestBody SessionRequestDTO sessionRequest,
@@ -142,6 +148,9 @@ public class SessionController {
             reponseCandidat.setQuestion(question);
             reponseCandidat.setOptionChoisie(reponse);
             reponseCandidat.setPointsObtenus(PointsTotal);
+
+            reponseCandidatRepository.save(reponseCandidat);
+            
         }
 
 
@@ -177,6 +186,9 @@ public class SessionController {
         
         return ResponseEntity.ok(response);
     }
+
+
+    
     
     
 

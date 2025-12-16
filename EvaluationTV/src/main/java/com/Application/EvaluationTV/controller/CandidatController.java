@@ -1,12 +1,16 @@
 package com.Application.EvaluationTV.controller;
 
 import com.Application.EvaluationTV.model.Question;
+import com.Application.EvaluationTV.model.ReponseCandidat;
 import com.Application.EvaluationTV.model.Session;
+import com.Application.EvaluationTV.repository.CandidatRepository;
 import com.Application.EvaluationTV.repository.SessionRepository;
 import com.Application.EvaluationTV.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CandidatController {
 
     private final SessionRepository sessionRepository;
+    private final CandidatRepository candidatRepository;
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasRole('CANDIDAT')")
@@ -64,6 +69,27 @@ public class CandidatController {
         
     //     //return ;
     // }
+
+    @GetMapping("/end-collaboration")
+    public ResponseEntity<Map<String, String>> getMethodName(@RequestParam String param) {
+
+        Map<String, String> obj = new HashMap<>();
+        
+        
+        obj.put("value", "okay");
+        return ResponseEntity.ok(obj);
+    }
+
+    @GetMapping("/get-My-result")
+    public ResponseEntity<List<Object>> getMyResult(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        List<Object> objs = candidatRepository.giveMyResult(userDetails.getId());
+
+        return ResponseEntity.ok(objs);
+    }
+    
+
+
     
     
 }

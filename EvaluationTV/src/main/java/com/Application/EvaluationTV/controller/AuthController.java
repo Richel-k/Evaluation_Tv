@@ -2,6 +2,11 @@ package com.Application.EvaluationTV.controller;
 
 import com.Application.EvaluationTV.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +21,8 @@ import com.Application.EvaluationTV.service.AuthService;
 import jakarta.validation.Valid;
 
 import com.Application.EvaluationTV.dto.*;
+import com.Application.EvaluationTV.repository.CandidatRepository;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -24,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AuthController {
 
     private final AuthService authService;
+    private final CandidatRepository candidatRepository;
 
     // Page de choix du type d'inscription
     @GetMapping("/")
@@ -126,6 +134,8 @@ public class AuthController {
 
         // Redirection basée sur le rôle
         if (userDetails.isCandidat()) {
+        
+
             return "redirect:/candidat/dashboard";
         } else if (userDetails.isExaminateur()) {
             return "redirect:/examinateur/dashboard";
@@ -133,4 +143,8 @@ public class AuthController {
 
         return "home";
     }
+
+
+    
+    
 }

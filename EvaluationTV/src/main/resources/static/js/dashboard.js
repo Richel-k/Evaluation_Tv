@@ -65,7 +65,7 @@ function refreshSessions() {
 function joinSession() {
     const code = document.getElementById('sessionCode').value;
     if (code) {
-        alert(`Connexion à la session: ${code}`);
+        //alert(`Connexion à la session: ${code}`);
         window.location.href = `/candidat/session/evaluation/${code}`;
     } else {
         alert('Veuillez entrer un code de session');
@@ -86,3 +86,31 @@ function viewDetailedResults(id) {
     alert(`Détails des résultats de la session ${id}`);
     // window.location.href = `/candidat/resultat/${id}`;
 }
+
+
+function getMyResult(){
+
+
+    try{
+        
+        fetch(`/candidat/get-My-result`, {
+            method : 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            let results = response.json()
+            results.forEach(element => {
+                
+            });
+        })
+    } catch (error) {
+        console.error('Erreur:', error);
+        this.showError('impossible de charger les résultats');  
+    }
+    
+
+
+}
+getMyResult()

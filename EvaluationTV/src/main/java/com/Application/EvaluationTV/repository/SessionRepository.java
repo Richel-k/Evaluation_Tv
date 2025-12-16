@@ -11,7 +11,7 @@ import com.Application.EvaluationTV.model.Candidat;
 import com.Application.EvaluationTV.model.Question;
 import com.Application.EvaluationTV.model.Session;
 
-public interface SessionRepository extends JpaRepository<Session, Long>{
+public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findByCode(String codeSession);
 
     @Query(value = """
@@ -22,4 +22,6 @@ public interface SessionRepository extends JpaRepository<Session, Long>{
 
             """, nativeQuery = true)
     List<Question> AllQuestionOfMe(@Param("sessionId") String sessionId);
+
+    
 }

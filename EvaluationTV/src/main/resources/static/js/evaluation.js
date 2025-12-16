@@ -143,16 +143,16 @@ class EvaluationSystem {
         this.answers.set(this.currentQuestionIndex,{
             answerIndex : answerIndex, 
             identifier : identifier, 
-            correct : correct
+            correct : correct 
         } );
 
         // Activer le bouton suivant
         document.getElementById('nextBtn').disabled = false;
-
+        
         // Sauvegarder automatiquement
         this.saveAnswer();
 
-        // Afficher la confirmation
+        // Afficher la confirmation 
         this.showAnswerConfirmation();
     }
 
@@ -160,19 +160,19 @@ class EvaluationSystem {
         const confirmation = document.getElementById('answerConfirmation');
         confirmation.style.display = 'flex';
 
-        let countdown = 3;
+        let countdown = this.questionTimeLeft;
         const countdownElement = document.getElementById('nextQuestionCountdown');
-        //countdownElement.textContent = countdown;
+        countdownElement.textContent = countdown;
 
-        // const countdownInterval = setInterval(() => {
-        //     countdown--;
-        //     countdownElement.textContent = countdown;
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
 
-        //     if (countdown <= 0) {
-        //         clearInterval(countdownInterval);
-        //         this.nextQuestion();
-        //     }
-        // }, 1000);
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                this.nextQuestion();
+            }
+        }, 2000);
     }
 
     nextQuestion() {
@@ -220,12 +220,14 @@ class EvaluationSystem {
     updateGlobalTimer() {
         const minutes = Math.floor(this.totalTime / 60);
         const seconds = this.totalTime % 60;
-        const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const timerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(1, '0')}`;
         document.getElementById('globalTimer').textContent = timerText;
     }
 
     startQuestionTimer() {
-        this.questionTimeLeft = this.config.timePerQuestion;
+        const part = this.questions[this.currentQuestionIndex].time.split(":")
+        let time = parseInt(part[0]) * 60 + parseInt(part[1])
+        this.questionTimeLeft = time * 2;// this.config.timePerQuestion;
         this.updateQuestionTimerDisplay();
 
         // Configurer le timer circulaire
@@ -237,7 +239,7 @@ class EvaluationSystem {
             this.updateQuestionTimerDisplay();
             this.updateCircularTimer();
 
-            if (this.questionTimeLeft <= 0) {
+            if (this.questionTimeLeft <= 1) {
                 this.handleTimeUp();
             } else if (this.questionTimeLeft <= 5) {
                 this.showTimeWarning();
@@ -405,17 +407,17 @@ class EvaluationSystem {
             timestamp: new Date().toISOString()
         };
 
-        try {
-            await fetch('/api/sessions/evaluation/save-answer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(answerData)
-            });
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde:', error);
-        }
+    //     try {
+    //         await fetch('/api/sessions/evaluation/save-answer', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(answerData)
+    //         });
+    //     } catch (error) {
+    //         console.error('Erreur lors de la sauvegarde:', error);
+    //     }
     }
 
     async endEvaluation() {
@@ -463,7 +465,12 @@ class EvaluationSystem {
             if (!response.ok) throw new Error('Erreur lors de la soumission');
 
             const result = await response.json();
-            return result;
+            console.log("Le résult est ", result);
+
+            alert("Merci pour votre participation !! .")
+
+            window.location.href = "/candidat/dashboard"
+            //return result;
         } catch (error) {
             console.error('Erreur:', error);
             this.showError('Erreur lors de la soumission. Veuillez réessayer.');
