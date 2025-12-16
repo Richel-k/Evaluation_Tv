@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class ReponseRequestDTO {
 
+    @NotBlank(message = "Identifiant de la réponse non nul")
+    private Long Id;
+
     @NotBlank(message = "Le texte de la réponse est obligatoire")
     @Size(min = 1, max = 500, message = "Le texte de la réponse doit contenir entre 1 et 500 caractères")
     private String texte;
@@ -17,4 +20,10 @@ public class ReponseRequestDTO {
 
     // @NotNull(message = "L'ordre de la réponse est obligatoire")
     // private Integer ordre;
+
+    public ReponseRequestDTO(Long id, String texte, Boolean estCorrecte) {
+        this.Id = id;
+        this.texte = texte;
+        this.correcte = estCorrecte;
+    }
 }

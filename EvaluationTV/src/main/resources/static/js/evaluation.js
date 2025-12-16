@@ -1,3 +1,12 @@
+const evaluationConfig = {
+    sessionId: /*[[${sessionId}]]*/ document.getElementById("CodeSessionCache").textContent,
+    totalQuestions: /*[[${totalQuestions}]]*/ 20,
+    timePerQuestion: 20, // secondes
+    allowBacktracking: false,
+    shuffleAnswers: /*[[${shuffleAnswers}]]*/ false,
+    showTimer: true
+};
+//console.log(document.getElementById("CodeSessionCache").textContent)
 
 class EvaluationSystem {
     constructor(config) {
@@ -43,6 +52,7 @@ class EvaluationSystem {
 
     displayCurrentQuestion() {
         if (this.currentQuestionIndex >= this.questions.length) {
+            console.log(this.questions.length)
             this.endEvaluation();
             return;
         }
@@ -53,10 +63,10 @@ class EvaluationSystem {
         document.getElementById('displayQuestionNumber').textContent = this.currentQuestionIndex + 1;
         document.getElementById('questionStatement').innerHTML = `<p>${question.enonce}</p>`;
         document.getElementById('questionPoints').textContent = `${question.points} point${question.points > 1 ? 's' : ''}`;
-        document.getElementById('questionDifficulty').textContent = this.getDifficultyLabel(question.difficulte);
+        //document.getElementById('questionDifficulty').textContent = this.getDifficultyLabel(question.difficulte);
 
         // Mettre à jour l'indicateur de type
-        this.updateQuestionTypeIndicator(question.typeQuestion);
+        //this.updateQuestionTypeIndicator(question.typeQuestion);
 
         // Afficher les réponses
         this.displayAnswers(question);
@@ -96,12 +106,14 @@ class EvaluationSystem {
             answers = this.shuffleArray([...answers]);
         }
 
-        const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
 
         answers.forEach((answer, index) => {
             const answerElement = document.createElement('div');
             answerElement.className = 'answer-option';
             answerElement.dataset.index = index;
+            answerElement.setAttribute("identifier", answer.id)
+            answerElement.setAttribute("correct", answer.correcte)
 
             answerElement.innerHTML = `
                 <div class="answer-letter">${letters[index]}</div>
@@ -123,8 +135,16 @@ class EvaluationSystem {
         const selectedOption = document.querySelectorAll('.answer-option')[answerIndex];
         selectedOption.classList.add('selected');
 
+        let identifier = selectedOption.getAttribute("identifier")
+        let correct = selectedOption.getAttribute("correct")
+
+
         // Enregistrer la réponse
-        this.answers.set(this.currentQuestionIndex, answerIndex);
+        this.answers.set(this.currentQuestionIndex,{
+            answerIndex : answerIndex, 
+            identifier : identifier, 
+            correct : correct
+        } );
 
         // Activer le bouton suivant
         document.getElementById('nextBtn').disabled = false;
@@ -142,17 +162,17 @@ class EvaluationSystem {
 
         let countdown = 3;
         const countdownElement = document.getElementById('nextQuestionCountdown');
-        countdownElement.textContent = countdown;
+        //countdownElement.textContent = countdown;
 
-        const countdownInterval = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = countdown;
+        // const countdownInterval = setInterval(() => {
+        //     countdown--;
+        //     countdownElement.textContent = countdown;
 
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                this.nextQuestion();
-            }
-        }, 1000);
+        //     if (countdown <= 0) {
+        //         clearInterval(countdownInterval);
+        //         this.nextQuestion();
+        //     }
+        // }, 1000);
     }
 
     nextQuestion() {
@@ -301,7 +321,7 @@ class EvaluationSystem {
         // Passer automatiquement à la question suivante après un délai
         setTimeout(() => {
             this.nextQuestion();
-        }, 2000);
+        }, 500);
     }
 
     stopQuestionTimer() {
@@ -376,6 +396,7 @@ class EvaluationSystem {
         nextBtn.disabled = !this.answers.has(this.currentQuestionIndex);
     }
 
+    
     async saveAnswer() {
         const answerData = {
             sessionId: this.config.sessionId,
@@ -385,7 +406,7 @@ class EvaluationSystem {
         };
 
         try {
-            await fetch('/api/evaluation/save-answer', {
+            await fetch('/api/sessions/evaluation/save-answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -401,7 +422,7 @@ class EvaluationSystem {
         this.isEvaluationActive = false;
         this.stopQuestionTimer();
 
-        if (this.globalTimer) {
+        if(this.globalTimer) {
             clearInterval(this.globalTimer);
         }
 
@@ -415,17 +436,23 @@ class EvaluationSystem {
     async submitEvaluation() {
         const evaluationData = {
             sessionId: this.config.sessionId,
-            answers: Array.from(this.answers.entries()).map(([questionIndex, answerIndex]) => ({
+            answers: Array.from(this.answers.entries()).map(([questionIndex, answerData]) => ({
                 questionIndex,
-                answerIndex,
-                questionId: this.questions[questionIndex]?.id
+                answerIndex : answerData.answerIndex,
+                answerId : answerData.identifier,
+                correct: Boolean(answerData.correct),
+                questionId: this.questions[answerData.answerIndex]?.numero,
+                points: this.questions[answerData.answerIndex]?.points
+
             })),
             duration: this.totalTime,
             completionTime: new Date().toISOString()
         };
 
+        console.log(evaluationData)
+
         try {
-            const response = await fetch('/api/evaluation/submit', {
+            const response = await fetch('/api/sessions/evaluation/submitEvaluation', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -503,34 +530,34 @@ class EvaluationSystem {
         this.updateQuestionDots();
     }
 
-    updateQuestionTypeIndicator(type) {
-        const indicator = document.getElementById('questionTypeIndicator');
-        let icon, text;
+    // updateQuestionTypeIndicator(type) {
+    //     const indicator = document.getElementById('questionTypeIndicator');
+    //     let icon, text;
 
-        switch (type) {
-            case 'SINGLE':
-                icon = 'fas fa-check-circle';
-                text = 'Choix unique (une seule réponse correcte)';
-                break;
-            case 'MULTIPLE':
-                icon = 'fas fa-tasks';
-                text = 'Choix multiple (plusieurs réponses correctes)';
-                break;
-            case 'TRUE_FALSE':
-                icon = 'fas fa-balance-scale';
-                text = 'Vrai/Faux';
-                break;
-            case 'TEXT':
-                icon = 'fas fa-keyboard';
-                text = 'Réponse texte';
-                break;
-            default:
-                icon = 'fas fa-question-circle';
-                text = 'Type de question';
-        }
+    //     switch (type) {
+    //         case 'SINGLE':
+    //             icon = 'fas fa-check-circle';
+    //             text = 'Choix unique (une seule réponse correcte)';
+    //             break;
+    //         case 'MULTIPLE':
+    //             icon = 'fas fa-tasks';
+    //             text = 'Choix multiple (plusieurs réponses correctes)';
+    //             break;
+    //         case 'TRUE_FALSE':
+    //             icon = 'fas fa-balance-scale';
+    //             text = 'Vrai/Faux';
+    //             break;
+    //         case 'TEXT':
+    //             icon = 'fas fa-keyboard';
+    //             text = 'Réponse texte';
+    //             break;
+    //         default:
+    //             icon = 'fas fa-question-circle';
+    //             text = 'Type de question';
+    //     }
 
-        indicator.innerHTML = `<i class="${icon}"></i> <span>${text}</span>`;
-    }
+    //     indicator.innerHTML = `<i class="${icon}"></i> <span>${text}</span>`;
+    // }
 
     getDifficultyLabel(difficulty) {
         switch (difficulty) {

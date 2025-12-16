@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <div style="display: none;" th:text="${codeSession}" id="CodeSessionCache" th:attr="CodeSessionCache = ${codeSession}"></div>
     <!-- Header avec infos de session -->
     <header class="evaluation-header">
         <div class="header-left">
@@ -100,6 +101,35 @@
                     </div>
                 </div>
             </div>
+            
+
+            <div class="control-container">
+                <!-- Confirmation de réponse -->
+                <div class="answer-confirmation" id="answerConfirmation" style="display: none;">
+                    <div class="confirmation-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="confirmation-text">
+                        <strong>Réponse enregistrée !</strong>
+                        <p>Passage à la question suivante dans <span id="nextQuestionCountdown">3</span> secondes...</p>
+                    </div>
+                </div>
+            
+                <!-- Boutons d'action -->
+                <div class="action-buttons">
+                    <button class="btn-secondary" id="flagBtn" onclick="toggleFlag()">
+                        <i class="far fa-flag"></i> Marquer la question
+                    </button>
+            
+                    <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                        <i class="fas fa-forward"></i> Question suivante
+                    </button>
+            
+                    <button class="btn-danger" id="endBtn" onclick="showConfirmationModal()">
+                        <i class="fas fa-stop-circle"></i> Terminer l'évaluation
+                    </button>
+                </div>
+            </div>
 
             <!-- Énoncé de la question -->
             <div class="question-body">
@@ -108,10 +138,10 @@
                 </div>
 
                 <!-- Indicateur de type de question -->
-                <div class="question-type-indicator" id="questionTypeIndicator">
+                <!-- <div class="question-type-indicator" id="questionTypeIndicator">
                     <i class="fas fa-check-circle"></i>
                     <span>Choix multiple (une seule réponse correcte)</span>
-                </div>
+                </div> -->
             </div>
 
             <!-- Réponses -->
@@ -141,33 +171,8 @@
         </div>
 
         <!-- Zone de contrôle -->
-        <div class="control-container">
-            <!-- Confirmation de réponse -->
-            <div class="answer-confirmation" id="answerConfirmation" style="display: none;">
-                <div class="confirmation-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="confirmation-text">
-                    <strong>Réponse enregistrée !</strong>
-                    <p>Passage à la question suivante dans <span id="nextQuestionCountdown">3</span> secondes...</p>
-                </div>
-            </div>
-
-            <!-- Boutons d'action -->
-            <div class="action-buttons">
-                <button class="btn-secondary" id="flagBtn" onclick="toggleFlag()">
-                    <i class="far fa-flag"></i> Marquer la question
-                </button>
-
-                <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
-                    <i class="fas fa-forward"></i> Question suivante
-                </button>
-
-                <button class="btn-danger" id="endBtn" onclick="showConfirmationModal()">
-                    <i class="fas fa-stop-circle"></i> Terminer l'évaluation
-                </button>
-            </div>
-        </div>
+        
+        
     </main>
 
     <!-- Modal de confirmation de fin -->
@@ -216,6 +221,7 @@
                 </button>
             </div>
         </div>
+
     </div>
 
     <!-- Modal de fin d'évaluation -->
@@ -272,17 +278,9 @@
         <source th:src="@{/sounds/next-question.mp3}" type="audio/mpeg">
     </audio>
 
-    <script th:src="@{/js/evaluation.js}"></script>
     <script>
         // Configuration initiale
-        const evaluationConfig = {
-            sessionId: /*[[${sessionId}]]*/ '1',
-            totalQuestions: /*[[${totalQuestions}]]*/ 20,
-            timePerQuestion: 30, // secondes
-            allowBacktracking: false,
-            shuffleAnswers: /*[[${shuffleAnswers}]]*/ false,
-            showTimer: true
-        };
+        
     </script>
 </body>
 

@@ -4,17 +4,24 @@ package com.Application.EvaluationTV.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.cglib.core.Local;
+
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class QuestionRequestDTO {
 
     @NotNull(message = "Le numéro de la question est obligatoire")
     @Min(value = 1, message = "Le numéro de la question doit être positif")
-    private Integer numero;
+    private Long numero;
 
     @NotBlank(message = "L'énoncé de la question est obligatoire")
     @Size(min = 5, max = 2000, message = "L'énoncé doit contenir entre 5 et 2000 caractères")
@@ -35,5 +42,12 @@ public class QuestionRequestDTO {
     private LocalTime time;
 
     @Valid
-    private List<ReponseRequestDTO> reponses;
+    private List<ReponseRequestDTO> reponses = new ArrayList<>();
+
+    public QuestionRequestDTO(Long numero, String enonce, Integer points, LocalTime time) {
+        this.numero = numero;
+        this.enonce = enonce;
+        this.points = points;
+        this.time = time;
+    }
 }

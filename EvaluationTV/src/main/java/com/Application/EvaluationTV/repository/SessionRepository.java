@@ -15,8 +15,8 @@ public interface SessionRepository extends JpaRepository<Session, Long>{
     Optional<Session> findByCode(String codeSession);
 
     @Query(value = """
-            select q.id, q.enonce, q.points
-            from question q
+            select q.id, q.enonce, q.points, q.time, q.type, q.session_id
+            from questions q
             join sessions s on s.id = q.session_id
             where s.code = :sessionId
 
