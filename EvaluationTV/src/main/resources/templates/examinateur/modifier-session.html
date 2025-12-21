@@ -49,6 +49,29 @@
                 <h3>📋 Mes Sessions Disponibles</h3>
                 <div class="sessions-grid" id="sessions-grid">
                     <!-- Les sessions seront chargées ici dynamiquement -->
+
+                    <div class="session-card" th:each="sessions : ${Sessions}"
+                        th:attr="onclick='loadSession(\'' + ${sessions[0]} + '\')'">
+                        <div class="session-card-header">
+                            <span class="session-card-code" th:text="${sessions[1]}">${session.code}</span>
+                            <span th:class="'session-status status-'+ ${sessions[3]} " th:text="${sessions[3]}">
+                                ${session.status === 'active' ? 'En cours' :
+                                session.status === 'planned' ? 'Planifiée' : 'Terminée'}
+                            </span>
+                        </div>
+                        <h4 class="session-card-title" th:text="${sessions[2]}">${session.title}</h4>
+                        <div class="session-card-meta">
+                            <span th:text="'📅  ' + ${#dates.format(sessions[6], 'EEEE dd MMMM yyyy')}">📅 15 Déc 2024</span>
+                            <span th:text="'⏰  ' + ${sessions[7]}">⏰ 14:00</span>
+                            <!-- <span>👥 ${session.candidates} candidats</span> -->
+                            <span th:text="'❓ ' + ${sessions[4]} + ' questions'"> ${session.questions} questions</span>
+                        </div>
+                        <div class="session-card-actions">
+                            <button class="btn-primary btn-small" th:attr="onclick='event.stopPropagation(); loadSession(${sessions[0]})'" >
+                                Modifier
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -290,6 +313,7 @@
             }
         ];
 
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.sidebar-overlay');
@@ -463,9 +487,9 @@
         }
 
         // Initialisation
-        document.addEventListener('DOMContentLoaded', function () {
-            loadSessions();
-        });
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     loadSessions();
+        // });
     </script>
 </body>
 

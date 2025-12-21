@@ -114,7 +114,7 @@ public class SessionController {
     System.out.println("Heure de fin: " + completionTime);
 
     Long MyId = userDetails.getId();
-    Integer PointsTotal = 0;
+    //Integer PointsTotal = 0;
     
     // 2. Extraire le tableau des réponses
     List<Map<String, Object>> answers = (List<Map<String, Object>>) payload.get("answers");
@@ -127,6 +127,7 @@ public class SessionController {
         Long questionId = Long.parseLong(answer.get("questionId").toString());
         Long reponseId = Long.parseLong(answer.get("answerId").toString());
         Boolean correct = (Boolean) answer.get("correct");
+        Integer PointsTotal = 0;
         Integer Points = (Integer) answer.get("points");
 
 
@@ -147,6 +148,7 @@ public class SessionController {
             reponseCandidat.setCandidat(candidat);
             reponseCandidat.setQuestion(question);
             reponseCandidat.setOptionChoisie(reponse);
+
             reponseCandidat.setPointsObtenus(PointsTotal);
 
             reponseCandidatRepository.save(reponseCandidat);

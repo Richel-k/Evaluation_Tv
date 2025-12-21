@@ -4,6 +4,7 @@ import com.Application.EvaluationTV.model.Session;
 import com.Application.EvaluationTV.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +33,15 @@ public class ExaminateurController {
         model.addAttribute("examinateur", userDetails.getPerson());
         model.addAttribute("nomComplet", userDetails.getNomComplet());
         model.addAttribute("MyEmail",  userDetails.getMyEmail());
+
+        //Les sessions crées
+        List<Object[]> MySessions = sessionRepository.GetMySessions(userDetails.getId());
+        // for(Object session : MySessions){
+
+        // }
+        model.addAttribute("Sessions", MySessions);
+
+
         return "examinateur/dashboard";
     }
 
@@ -41,7 +51,13 @@ public class ExaminateurController {
     }
 
     @GetMapping("/update-session")
-    public String UpdateSession() {
+    public String UpdateSession(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<Object[]> MySessions = sessionRepository.GetMySessions(userDetails.getId());
+        // for(Object session : MySessions){
+
+        // }
+        model.addAttribute("Sessions", MySessions);
+
         return "examinateur/modifier-session";
     }
 

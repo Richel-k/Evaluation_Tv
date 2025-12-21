@@ -108,8 +108,29 @@
                     </button>
                 </div>
 
+
+                <div class="session-item" th:each="sessions : ${Sessions}">
+                    <div class="session-header">
+                        <span class="session-code" th:text="${sessions[1]}">SESSION-2024-001</span>
+                        <span class="session-status status-active" th:text="${sessions[3]}">En cours</span>
+                    </div>
+                    <div class="session-title" th:text="${sessions[2]}">Examen de Programmation Java</div>
+                    <div class="session-details">
+                        <span th:text="'📅  ' + ${sessions[6]} ">📅 15 Déc 2024</span>
+                        <span th:text="'⏰  ' + ${sessions[7]}">⏰ 14:00</span>
+                        <span>👥 45 candidats</span>
+                        <!-- <span th:text="${'❓  ' + sessions[4]} + '  Questions'">❓ 20 questions</span> -->
+                        <span th:text="'✅  ' + ${sessions[5]} + ' Points au total'"></span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewSession(1)">Voir</button>
+                        <button class="btn-small btn-secondary" onclick="editSession(1)">Modifier</button>
+                        <button class="btn-small btn-danger" onclick="deleteSession(1)">Supprimer</button>
+                    </div>
+                </div>
+
                 <!-- Session Item 1 -->
-                <div class="session-item">
+                <!-- <div class="session-item">
                     <div class="session-header">
                         <span class="session-code">SESSION-2024-001</span>
                         <span class="session-status status-active">En cours</span>
@@ -126,10 +147,10 @@
                         <button class="btn-small btn-secondary" onclick="editSession(1)">Modifier</button>
                         <button class="btn-small btn-danger" onclick="deleteSession(1)">Supprimer</button>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Session Item 2 -->
-                <div class="session-item">
+                <!-- <div class="session-item">
                     <div class="session-header">
                         <span class="session-code">SESSION-2024-002</span>
                         <span class="session-status status-planned">Planifiée</span>
@@ -146,10 +167,10 @@
                         <button class="btn-small btn-secondary" onclick="editSession(2)">Modifier</button>
                         <button class="btn-small btn-danger" onclick="deleteSession(2)">Supprimer</button>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Session Item 3 -->
-                <div class="session-item">
+                <!-- <div class="session-item">
                     <div class="session-header">
                         <span class="session-code">SESSION-2024-003</span>
                         <span class="session-status status-ended">Terminée</span>
@@ -165,7 +186,7 @@
                         <button class="btn-small btn-primary" onclick="viewResults(3)">Résultats</button>
                         <button class="btn-small btn-secondary" onclick="exportResults(3)">Exporter</button>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

@@ -89,27 +89,64 @@ function viewDetailedResults(id) {
 
 
 function getMyResult(){
+    if( window.location.href.includes("candidat")){
+        try {
 
+            fetch(`/candidat/get-My-result`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json()
+                    // results.forEach(element => {
 
-    try{
-        
-        fetch(`/candidat/get-My-result`, {
-            method : 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            let results = response.json()
-            results.forEach(element => {
-                
-            });
-        })
-    } catch (error) {
-        console.error('Erreur:', error);
-        this.showError('impossible de charger les résultats');  
+                    // });
+
+                )
+                .then(results => {
+                    console.log(results)
+
+                    let ResultBloc = document.querySelector(".sessions-section")
+                    // let Result = results[0]
+                    // console.log(Result)
+                    // console.log(ResultBloc)
+
+                    results.forEach((result, index) => {
+                        console.log(`Résultat ${index + 1}:`);
+                        console.log(`  Titre: ${result.title}`);
+                        console.log(`  Points: ${result.points}`);
+                        console.log(`  Session ID: ${result.session_id}`);
+                        console.log(`  Date: ${new Date(result.date_debut).toLocaleDateString()}`);
+
+                        let plainText = `
+                 <div class="session-item">
+                    <div class="session-header">
+                        <span class="session-code">${result.session_id}</span>
+                        <span class="session-status status-ended">Terminée</span>
+                    </div>
+                    <div class="session-title">${result.title}</div>
+                    <div class="session-details">
+                        <span>📅 ${new Date(result.date_debut).toLocaleDateString('fr-FR')}</span>
+                        <span>⏰ ${new Date(result.date_debut).getHours()}:${String(new Date(result.date_debut).getMinutes()).padStart(2, '0')}</span>
+                        <span>✅ ${result.points} points</span>
+                        <span>📊 ${result.points} / ${result.total}</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn-small btn-primary" onclick="viewDetailedResults(1)">Détails</button>
+                    </div>
+                </div>
+                `;
+
+                        ResultBloc.insertAdjacentHTML('beforeend', plainText);
+                    });
+                })
+        } catch (error) {
+            console.error('Erreur:', error);
+            this.showError('impossible de charger les résultats');
+        }
+
     }
-    
 
 
 }

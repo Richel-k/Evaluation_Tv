@@ -8,6 +8,7 @@ import com.Application.EvaluationTV.repository.SessionRepository;
 import com.Application.EvaluationTV.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,11 +82,29 @@ public class CandidatController {
     }
 
     @GetMapping("/get-My-result")
-    public ResponseEntity<List<Object>> getMyResult(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> getMyResult(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<Object> objs = candidatRepository.giveMyResult(userDetails.getId());
+        List<Map<String, Object>> formattedResults = new ArrayList<>();
 
-        return ResponseEntity.ok(objs);
+        List<Object[]> obj = candidatRepository.giveMyResult(userDetails.getId());
+
+        for(Object[] row : obj){
+
+            Map<String, Object> objs = new HashMap<>();
+            objs.put("session_id", row[0]);
+            objs.put("title", row[1]);
+            objs.put("points", row[3]);
+            objs.put("date_debut", row[2]);
+            Integer somme = sessionRepository.GetAllPoints((String) row[0]);
+            objs.put("total", somme);
+
+            formattedResults.add(objs);
+        }
+        
+
+
+
+        return ResponseEntity.ok(formattedResults);
     }
     
 
